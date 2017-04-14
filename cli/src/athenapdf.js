@@ -40,6 +40,7 @@ athena
     .option("--no-cache", "disables caching")
     .option("--ignore-certificate-errors", "ignores certificate errors")
     .option("--ignore-gpu-blacklist", "Enables GPU in Docker environment")
+    //.option("--output-type", "PDF, JPG")
     .arguments("<URI> [output]")
     .action((uri, output) => {
         uriArg = uri;
@@ -229,10 +230,16 @@ app.on("ready", () => {
 
     bw.webContents.on("did-finish-load", () => {
         setTimeout(() => {
-            bw.webContents.printToPDF(pdfOpts, (err, data) => {
-                if (err) console.error(err);
+            // https://github.com/electron/electron/blob/master/docs/api/web-contents.md#contentscapturepagerect-callback
+             bw.webContents.capturePage ((image) => {
+                // https://github.com/electron/electron/blob/master/docs/api/native-image.md#imagetopngoptions
+                var data = image.toPNG();
                 _output(data);
             });
+        //    bw.webContents.printToPDF(pdfOpts, (err, data) => {
+        //        if (err) console.error(err);
+        //        _output(data);
+        //    });
         }, (athena.delay || 200));
     });
 });
